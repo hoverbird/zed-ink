@@ -36,6 +36,13 @@ impl InkExtension {
                 args: binary_args,
             });
         }
+        // Skip system inklecate - we need the LSP-enabled version from yuna0x0/ink-lsp
+        // if let Some(path) = worktree.which("inklecate") {
+        //     return Ok(InkLanguageServerBinary {
+        //         path,
+        //         args: binary_args,
+        //     });
+        // }
 
         if let Some(path) = &self.cached_binary_path {
             if fs::metadata(path).map_or(false, |stat| stat.is_file()) {
@@ -131,7 +138,7 @@ impl zed::Extension for InkExtension {
         worktree: &zed::Worktree,
     ) -> Result<zed::Command> {
         let inklecate_binary = self.language_server_binary(language_server_id, worktree)?;
-        
+
         // Debug: Try to understand what we're working with
         if let Ok(metadata) = fs::metadata(&inklecate_binary.path) {
             if !metadata.is_file() {
@@ -146,7 +153,7 @@ impl zed::Extension for InkExtension {
             // Try various possible LSP flags
             vec!["--language-server".into()] // This is more likely than "-l"
         });
-        
+
         Ok(zed::Command {
             command: inklecate_binary.path,
             args,
